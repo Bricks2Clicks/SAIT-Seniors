@@ -27,11 +27,30 @@
 .topbar {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem 1.5rem;
   margin-bottom: 1.1rem;
   animation: rise 0.7s ease both;
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.brand-logo {
+  width: clamp(2.5rem, 6vw, 3.5rem);
+  height: auto;
+  flex-shrink: 0;
+  display: block;
+  border-radius: 22%;
+}
+
+.brand-text {
+  min-width: 0;
 }
 
 .controls-bar {
@@ -294,7 +313,7 @@
 .brand-mark {
   display: block;
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-size: clamp(1.65rem, 4vw, 2.75rem);
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -303,9 +322,9 @@
 
 .brand-tag {
   display: block;
-  margin-top: 0.35rem;
+  margin-top: 0.3rem;
   color: var(--ink-soft);
-  font-size: 0.95rem;
+  font-size: clamp(0.85rem, 2.4vw, 0.95rem);
 }
 
 .worker-picker {
@@ -803,6 +822,15 @@
 @media (max-width: 640px) {
   .shell {
     padding: 1rem 0.85rem 2rem;
+  }
+
+  .brand-lockup {
+    gap: 0.6rem;
+  }
+
+  .worker-picker {
+    width: 100%;
+    min-width: 0;
   }
 
   .want-form {

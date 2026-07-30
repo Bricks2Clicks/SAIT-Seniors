@@ -338,8 +338,20 @@ export default function App() {
 
       <header className="topbar">
         <div className="brand">
-          <span className="brand-mark">Unstuck</span>
-          <span className="brand-tag">Afford wants without the trap</span>
+          <div className="brand-lockup">
+            <img
+              className="brand-logo"
+              src="/unstuck-icon.png"
+              alt=""
+              width={56}
+              height={56}
+              decoding="async"
+            />
+            <div className="brand-text">
+              <span className="brand-mark">Unstuck</span>
+              <span className="brand-tag">Afford wants without the trap</span>
+            </div>
+          </div>
         </div>
         <label className="worker-picker">
           <span>Demo worker</span>
