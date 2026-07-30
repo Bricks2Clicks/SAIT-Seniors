@@ -1,0 +1,837 @@
+{
+  "app": "Unstuck",
+  "as_of": "2026-04-28",
+  "currency": "CAD",
+  "workers": [
+    {
+      "worker_id": "W-0001",
+      "as_of": "2026-04-28",
+      "profile": {
+        "city": "Calgary",
+        "occupation": "Moving helper",
+        "pay_type": "daily",
+        "typical_daily_net": 188.71,
+        "income_volatility": 0.48,
+        "household_size": 2,
+        "dependents": 0,
+        "commute_mode": "car",
+        "rent_burden_band": "severe",
+        "has_side_gig": false,
+        "has_bank_account": true
+      },
+      "snapshot": {
+        "balance": 743.67,
+        "buffer_days": 0.7,
+        "buffer_capped": false,
+        "flex_now": 0.0,
+        "buffer_floor": 566.13,
+        "essential_due_14d": 2276.0,
+        "avg_shift_net": 180.13,
+        "commute_per_day": 9.07,
+        "shift_net_after_commute": 171.06,
+        "food_out_avg": 27.22,
+        "food_out_count_28d": 4,
+        "work_days_28d": 17,
+        "advance_count_month": 3,
+        "advance_fees_month": 6.98,
+        "advance_reasons": {
+          "groceries": 1,
+          "transit": 1,
+          "bill_due": 1
+        }
+      },
+      "next_cliff": {
+        "id": "O-00001",
+        "name": "Rent",
+        "category": "housing",
+        "amount": 2056.0,
+        "due_date": "2026-05-01",
+        "days_until": 3,
+        "essential": true,
+        "autopay": true
+      },
+      "cliffs": [
+        {
+          "id": "O-00001",
+          "name": "Rent",
+          "category": "housing",
+          "amount": 2056.0,
+          "due_date": "2026-05-01",
+          "days_until": 3,
+          "essential": true,
+          "autopay": true
+        },
+        {
+          "id": "O-00002",
+          "name": "Mobile phone",
+          "category": "phone",
+          "amount": 66.0,
+          "due_date": "2026-05-01",
+          "days_until": 3,
+          "essential": true,
+          "autopay": true
+        },
+        {
+          "id": "O-00003",
+          "name": "Utilities",
+          "category": "utilities",
+          "amount": 154.0,
+          "due_date": "2026-05-05",
+          "days_until": 7,
+          "essential": true,
+          "autopay": true
+        },
+        {
+          "id": "O-00004",
+          "name": "Streaming / subscription",
+          "category": "entertainment",
+          "amount": 9.99,
+          "due_date": "2026-05-22",
+          "days_until": 24,
+          "essential": false,
+          "autopay": true
+        }
+      ],
+      "recent_weeks": [
+        {
+          "week_start": "2026-03-30",
+          "income": 469.44,
+          "expense": 2534.9,
+          "essential_expense": 2513.41,
+          "net": -2065.46,
+          "buffer_days": 5.2,
+          "advances": 1,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-06",
+          "income": 1091.14,
+          "expense": 335.25,
+          "essential_expense": 251.08,
+          "net": 755.89,
+          "buffer_days": 46.5,
+          "advances": 0,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-13",
+          "income": 571.32,
+          "expense": 477.11,
+          "essential_expense": 427.32,
+          "net": 94.21,
+          "buffer_days": 17.0,
+          "advances": 1,
+          "advance_fees": 1.99
+        },
+        {
+          "week_start": "2026-04-20",
+          "income": 543.95,
+          "expense": 204.89,
+          "essential_expense": 175.61,
+          "net": 339.06,
+          "buffer_days": 111.0,
+          "advances": 0,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-27",
+          "income": 895.53,
+          "expense": 2704.41,
+          "essential_expense": 2607.61,
+          "net": -1808.88,
+          "buffer_days": 0.7,
+          "advances": 2,
+          "advance_fees": 4.99
+        }
+      ],
+      "want_presets": [
+        {
+          "label": "Night out",
+          "amount": 45
+        },
+        {
+          "label": "New shoes",
+          "amount": 80
+        },
+        {
+          "label": "Kids treat",
+          "amount": 25
+        },
+        {
+          "label": "Send family money",
+          "amount": 100
+        },
+        {
+          "label": "Streaming / game",
+          "amount": 15
+        }
+      ]
+    },
+    {
+      "worker_id": "W-0046",
+      "as_of": "2026-04-28",
+      "profile": {
+        "city": "Calgary",
+        "occupation": "Landscaping / grounds",
+        "pay_type": "daily",
+        "typical_daily_net": 196.96,
+        "income_volatility": 0.45,
+        "household_size": 2,
+        "dependents": 1,
+        "commute_mode": "transit",
+        "rent_burden_band": "severe",
+        "has_side_gig": false,
+        "has_bank_account": true
+      },
+      "snapshot": {
+        "balance": 1436.49,
+        "buffer_days": 44.8,
+        "buffer_capped": false,
+        "flex_now": 0.0,
+        "buffer_floor": 590.88,
+        "essential_due_14d": 950.0,
+        "avg_shift_net": 208.98,
+        "commute_per_day": 9.77,
+        "shift_net_after_commute": 199.21,
+        "food_out_avg": 32.21,
+        "food_out_count_28d": 4,
+        "work_days_28d": 12,
+        "advance_count_month": 2,
+        "advance_fees_month": 10.41,
+        "advance_reasons": {
+          "emergency": 1,
+          "childcare": 1
+        }
+      },
+      "next_cliff": {
+        "id": "O-00172",
+        "name": "Utilities",
+        "category": "utilities",
+        "amount": 145.0,
+        "due_date": "2026-05-05",
+        "days_until": 7,
+        "essential": true,
+        "autopay": false
+      },
+      "cliffs": [
+        {
+          "id": "O-00172",
+          "name": "Utilities",
+          "category": "utilities",
+          "amount": 145.0,
+          "due_date": "2026-05-05",
+          "days_until": 7,
+          "essential": true,
+          "autopay": false
+        },
+        {
+          "id": "O-00173",
+          "name": "Childcare",
+          "category": "childcare",
+          "amount": 805.0,
+          "due_date": "2026-05-07",
+          "days_until": 9,
+          "essential": true,
+          "autopay": false
+        },
+        {
+          "id": "O-00170",
+          "name": "Rent",
+          "category": "housing",
+          "amount": 1956.0,
+          "due_date": "2026-05-15",
+          "days_until": 17,
+          "essential": true,
+          "autopay": false
+        },
+        {
+          "id": "O-00171",
+          "name": "Mobile phone",
+          "category": "phone",
+          "amount": 47.0,
+          "due_date": "2026-05-17",
+          "days_until": 19,
+          "essential": true,
+          "autopay": false
+        }
+      ],
+      "recent_weeks": [
+        {
+          "week_start": "2026-03-30",
+          "income": 0.0,
+          "expense": 424.04,
+          "essential_expense": 292.13,
+          "net": -424.04,
+          "buffer_days": 130.8,
+          "advances": 1,
+          "advance_fees": 8.42
+        },
+        {
+          "week_start": "2026-04-06",
+          "income": 1447.0,
+          "expense": 1127.68,
+          "essential_expense": 1044.73,
+          "net": 319.32,
+          "buffer_days": 12.7,
+          "advances": 0,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-13",
+          "income": 589.05,
+          "expense": 2241.24,
+          "essential_expense": 2157.81,
+          "net": -1652.19,
+          "buffer_days": 6.2,
+          "advances": 1,
+          "advance_fees": 1.99
+        },
+        {
+          "week_start": "2026-04-20",
+          "income": 471.74,
+          "expense": 391.85,
+          "essential_expense": 189.21,
+          "net": 79.89,
+          "buffer_days": 60.1,
+          "advances": 0,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-27",
+          "income": 535.02,
+          "expense": 261.75,
+          "essential_expense": 197.05,
+          "net": 273.27,
+          "buffer_days": 44.8,
+          "advances": 1,
+          "advance_fees": 4.19
+        }
+      ],
+      "want_presets": [
+        {
+          "label": "Night out",
+          "amount": 45
+        },
+        {
+          "label": "New shoes",
+          "amount": 80
+        },
+        {
+          "label": "Kids treat",
+          "amount": 25
+        },
+        {
+          "label": "Send family money",
+          "amount": 100
+        },
+        {
+          "label": "Streaming / game",
+          "amount": 15
+        }
+      ]
+    },
+    {
+      "worker_id": "W-0156",
+      "as_of": "2026-04-28",
+      "profile": {
+        "city": "Calgary",
+        "occupation": "Gig delivery driver",
+        "pay_type": "gig",
+        "typical_daily_net": 89.32,
+        "income_volatility": 0.55,
+        "household_size": 1,
+        "dependents": 0,
+        "commute_mode": "rideshare",
+        "rent_burden_band": "high",
+        "has_side_gig": false,
+        "has_bank_account": true
+      },
+      "snapshot": {
+        "balance": 1386.23,
+        "buffer_days": 8.8,
+        "buffer_capped": false,
+        "flex_now": 0.0,
+        "buffer_floor": 267.96,
+        "essential_due_14d": 1304.0,
+        "avg_shift_net": 85.31,
+        "commute_per_day": 10.59,
+        "shift_net_after_commute": 74.72,
+        "food_out_avg": 9.77,
+        "food_out_count_28d": 1,
+        "work_days_28d": 15,
+        "advance_count_month": 0,
+        "advance_fees_month": 0.0,
+        "advance_reasons": {}
+      },
+      "next_cliff": {
+        "id": "O-00605",
+        "name": "Rent",
+        "category": "housing",
+        "amount": 1221.0,
+        "due_date": "2026-05-01",
+        "days_until": 3,
+        "essential": true,
+        "autopay": true
+      },
+      "cliffs": [
+        {
+          "id": "O-00605",
+          "name": "Rent",
+          "category": "housing",
+          "amount": 1221.0,
+          "due_date": "2026-05-01",
+          "days_until": 3,
+          "essential": true,
+          "autopay": true
+        },
+        {
+          "id": "O-00606",
+          "name": "Mobile phone",
+          "category": "phone",
+          "amount": 83.0,
+          "due_date": "2026-05-01",
+          "days_until": 3,
+          "essential": true,
+          "autopay": true
+        },
+        {
+          "id": "O-00608",
+          "name": "Streaming / subscription",
+          "category": "entertainment",
+          "amount": 24.99,
+          "due_date": "2026-05-06",
+          "days_until": 8,
+          "essential": false,
+          "autopay": true
+        },
+        {
+          "id": "O-00607",
+          "name": "Installment / loan payment",
+          "category": "debt_payment",
+          "amount": 124.0,
+          "due_date": "2026-05-16",
+          "days_until": 18,
+          "essential": true,
+          "autopay": true
+        }
+      ],
+      "recent_weeks": [
+        {
+          "week_start": "2026-03-30",
+          "income": 229.06,
+          "expense": 1637.62,
+          "essential_expense": 1533.05,
+          "net": -1408.56,
+          "buffer_days": 1.5,
+          "advances": 0,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-06",
+          "income": 452.89,
+          "expense": 453.89,
+          "essential_expense": 385.88,
+          "net": -1.0,
+          "buffer_days": 14.3,
+          "advances": 0,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-13",
+          "income": 139.92,
+          "expense": 176.68,
+          "essential_expense": 124.0,
+          "net": -36.76,
+          "buffer_days": 52.4,
+          "advances": 0,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-20",
+          "income": 340.31,
+          "expense": 9.77,
+          "essential_expense": 0.0,
+          "net": 330.54,
+          "buffer_days": null,
+          "advances": 0,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-27",
+          "income": 371.87,
+          "expense": 1304.0,
+          "essential_expense": 1304.0,
+          "net": -932.13,
+          "buffer_days": 8.8,
+          "advances": 0,
+          "advance_fees": 0.0
+        }
+      ],
+      "want_presets": [
+        {
+          "label": "Night out",
+          "amount": 45
+        },
+        {
+          "label": "New shoes",
+          "amount": 80
+        },
+        {
+          "label": "Kids treat",
+          "amount": 25
+        },
+        {
+          "label": "Send family money",
+          "amount": 100
+        },
+        {
+          "label": "Streaming / game",
+          "amount": 15
+        }
+      ]
+    },
+    {
+      "worker_id": "W-0036",
+      "as_of": "2026-04-28",
+      "profile": {
+        "city": "Calgary",
+        "occupation": "Security guard",
+        "pay_type": "hourly",
+        "typical_daily_net": 190.54,
+        "income_volatility": 0.2,
+        "household_size": 1,
+        "dependents": 0,
+        "commute_mode": "transit",
+        "rent_burden_band": "severe",
+        "has_side_gig": false,
+        "has_bank_account": true
+      },
+      "snapshot": {
+        "balance": 4093.18,
+        "buffer_days": 11.2,
+        "buffer_capped": false,
+        "flex_now": 1686.56,
+        "buffer_floor": 571.62,
+        "essential_due_14d": 1835.0,
+        "avg_shift_net": 187.52,
+        "commute_per_day": 14.78,
+        "shift_net_after_commute": 172.74,
+        "food_out_avg": 19.17,
+        "food_out_count_28d": 3,
+        "work_days_28d": 16,
+        "advance_count_month": 2,
+        "advance_fees_month": 5.16,
+        "advance_reasons": {
+          "bill_due": 1,
+          "other": 1
+        }
+      },
+      "next_cliff": {
+        "id": "O-00136",
+        "name": "Rent",
+        "category": "housing",
+        "amount": 1835.0,
+        "due_date": "2026-05-01",
+        "days_until": 3,
+        "essential": true,
+        "autopay": false
+      },
+      "cliffs": [
+        {
+          "id": "O-00136",
+          "name": "Rent",
+          "category": "housing",
+          "amount": 1835.0,
+          "due_date": "2026-05-01",
+          "days_until": 3,
+          "essential": true,
+          "autopay": false
+        },
+        {
+          "id": "O-00137",
+          "name": "Mobile phone",
+          "category": "phone",
+          "amount": 92.0,
+          "due_date": "2026-05-15",
+          "days_until": 17,
+          "essential": true,
+          "autopay": false
+        }
+      ],
+      "recent_weeks": [
+        {
+          "week_start": "2026-03-30",
+          "income": 339.85,
+          "expense": 1988.9,
+          "essential_expense": 1988.9,
+          "net": -1649.05,
+          "buffer_days": 17.2,
+          "advances": 0,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-06",
+          "income": 870.89,
+          "expense": 315.69,
+          "essential_expense": 223.3,
+          "net": 555.2,
+          "buffer_days": 51.9,
+          "advances": 0,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-13",
+          "income": 570.25,
+          "expense": 449.97,
+          "essential_expense": 383.19,
+          "net": 120.28,
+          "buffer_days": 78.3,
+          "advances": 1,
+          "advance_fees": 3.17
+        },
+        {
+          "week_start": "2026-04-20",
+          "income": 815.45,
+          "expense": 89.14,
+          "essential_expense": 15.59,
+          "net": 726.31,
+          "buffer_days": 1854.5,
+          "advances": 1,
+          "advance_fees": 1.99
+        },
+        {
+          "week_start": "2026-04-27",
+          "income": 1001.26,
+          "expense": 2459.51,
+          "essential_expense": 2232.02,
+          "net": -1458.25,
+          "buffer_days": 11.2,
+          "advances": 1,
+          "advance_fees": 4.91
+        }
+      ],
+      "want_presets": [
+        {
+          "label": "Night out",
+          "amount": 45
+        },
+        {
+          "label": "New shoes",
+          "amount": 80
+        },
+        {
+          "label": "Kids treat",
+          "amount": 25
+        },
+        {
+          "label": "Send family money",
+          "amount": 100
+        },
+        {
+          "label": "Streaming / game",
+          "amount": 15
+        }
+      ]
+    },
+    {
+      "worker_id": "W-0186",
+      "as_of": "2026-04-28",
+      "profile": {
+        "city": "Calgary",
+        "occupation": "Moving helper",
+        "pay_type": "daily",
+        "typical_daily_net": 186.55,
+        "income_volatility": 0.48,
+        "household_size": 2,
+        "dependents": 0,
+        "commute_mode": "car",
+        "rent_burden_band": "moderate",
+        "has_side_gig": true,
+        "has_bank_account": false
+      },
+      "snapshot": {
+        "balance": 5011.74,
+        "buffer_days": 32.0,
+        "buffer_capped": false,
+        "flex_now": 3621.09,
+        "buffer_floor": 559.65,
+        "essential_due_14d": 831.0,
+        "avg_shift_net": 198.3,
+        "commute_per_day": 4.2,
+        "shift_net_after_commute": 194.11,
+        "food_out_avg": 29.18,
+        "food_out_count_28d": 6,
+        "work_days_28d": 14,
+        "advance_count_month": 2,
+        "advance_fees_month": 10.54,
+        "advance_reasons": {
+          "groceries": 1,
+          "other": 1
+        }
+      },
+      "next_cliff": {
+        "id": "O-00722",
+        "name": "Rent",
+        "category": "housing",
+        "amount": 831.0,
+        "due_date": "2026-05-01",
+        "days_until": 3,
+        "essential": true,
+        "autopay": false
+      },
+      "cliffs": [
+        {
+          "id": "O-00722",
+          "name": "Rent",
+          "category": "housing",
+          "amount": 831.0,
+          "due_date": "2026-05-01",
+          "days_until": 3,
+          "essential": true,
+          "autopay": false
+        },
+        {
+          "id": "O-00725",
+          "name": "Streaming / subscription",
+          "category": "entertainment",
+          "amount": 24.99,
+          "due_date": "2026-05-08",
+          "days_until": 10,
+          "essential": false,
+          "autopay": true
+        },
+        {
+          "id": "O-00723",
+          "name": "Mobile phone",
+          "category": "phone",
+          "amount": 79.0,
+          "due_date": "2026-05-23",
+          "days_until": 25,
+          "essential": true,
+          "autopay": true
+        },
+        {
+          "id": "O-00724",
+          "name": "Utilities",
+          "category": "utilities",
+          "amount": 79.0,
+          "due_date": "2026-05-25",
+          "days_until": 27,
+          "essential": true,
+          "autopay": true
+        }
+      ],
+      "recent_weeks": [
+        {
+          "week_start": "2026-03-30",
+          "income": 184.19,
+          "expense": 1544.36,
+          "essential_expense": 1426.22,
+          "net": -1360.17,
+          "buffer_days": 33.6,
+          "advances": 0,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-06",
+          "income": 563.28,
+          "expense": 482.96,
+          "essential_expense": 276.37,
+          "net": 80.32,
+          "buffer_days": 159.6,
+          "advances": 1,
+          "advance_fees": 5.29
+        },
+        {
+          "week_start": "2026-04-13",
+          "income": 532.1,
+          "expense": 815.93,
+          "essential_expense": 667.61,
+          "net": -283.83,
+          "buffer_days": 57.5,
+          "advances": 1,
+          "advance_fees": 5.25
+        },
+        {
+          "week_start": "2026-04-20",
+          "income": 881.42,
+          "expense": 338.15,
+          "essential_expense": 251.71,
+          "net": 543.27,
+          "buffer_days": 147.6,
+          "advances": 0,
+          "advance_fees": 0.0
+        },
+        {
+          "week_start": "2026-04-27",
+          "income": 933.05,
+          "expense": 1302.76,
+          "essential_expense": 1064.28,
+          "net": -369.71,
+          "buffer_days": 32.0,
+          "advances": 1,
+          "advance_fees": 1.99
+        }
+      ],
+      "want_presets": [
+        {
+          "label": "Night out",
+          "amount": 45
+        },
+        {
+          "label": "New shoes",
+          "amount": 80
+        },
+        {
+          "label": "Kids treat",
+          "amount": 25
+        },
+        {
+          "label": "Send family money",
+          "amount": 100
+        },
+        {
+          "label": "Streaming / game",
+          "amount": 15
+        }
+      ]
+    }
+  ],
+  "picker": [
+    {
+      "worker_id": "W-0001",
+      "label": "Moving helper \u00b7 Calgary",
+      "pay_type": "daily",
+      "rent_burden_band": "severe",
+      "buffer_days": 0.7
+    },
+    {
+      "worker_id": "W-0046",
+      "label": "Landscaping / grounds \u00b7 Calgary",
+      "pay_type": "daily",
+      "rent_burden_band": "severe",
+      "buffer_days": 44.8
+    },
+    {
+      "worker_id": "W-0156",
+      "label": "Gig delivery driver \u00b7 Calgary",
+      "pay_type": "gig",
+      "rent_burden_band": "high",
+      "buffer_days": 8.8
+    },
+    {
+      "worker_id": "W-0036",
+      "label": "Security guard \u00b7 Calgary",
+      "pay_type": "hourly",
+      "rent_burden_band": "severe",
+      "buffer_days": 11.2
+    },
+    {
+      "worker_id": "W-0186",
+      "label": "Moving helper \u00b7 Calgary",
+      "pay_type": "daily",
+      "rent_burden_band": "moderate",
+      "buffer_days": 32.0
+    }
+  ]
+}
