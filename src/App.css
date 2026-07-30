@@ -77,7 +77,8 @@
 
 .household-block {
   display: grid;
-  gap: 0.35rem;
+  gap: 0.45rem;
+  min-width: min(100%, 34rem);
 }
 
 .household-label {
@@ -87,6 +88,30 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.household-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem 0.85rem;
+}
+
+.household-detail {
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+}
+
+.household-hint {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.segmented--chips button {
+  min-width: 2.1rem;
+  padding-inline: 0.55rem;
 }
 
 .amount-chips {
@@ -804,6 +829,11 @@
 
   .household-block {
     width: 100%;
+    min-width: 0;
+  }
+
+  .household-details {
+    grid-template-columns: 1fr;
   }
 
   .context-rail {

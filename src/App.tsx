@@ -1,11 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   AMOUNT_CHIPS,
+  CHILDREN_OPTIONS,
   HOUSEHOLD_LABELS,
+  applyChildrenCount,
+  applyHouseholdType,
+  applyIncomeSource,
   buildAffordOptions,
   buildVacationPlan,
+  childrenLabel,
   cycleInsight,
-  inferHousehold,
+  householdFraming,
+  householdSummary,
+  incomeSourceLabel,
+  incomeSourcesFor,
+  inferHouseholdDetails,
   money,
   moneyExact,
   vacationSuggestionsFor,
@@ -13,8 +22,11 @@ import {
 } from './lib/afford'
 import type {
   AffordOption,
+  ChildrenCount,
   DemoData,
+  HouseholdDetails,
   HouseholdType,
+  IncomeSource,
   OptionKind,
   WorkerDemo,
 } from './lib/types'
@@ -32,6 +44,13 @@ const KIND_LABEL: Record<OptionKind, string> = {
 }
 
 const HOUSEHOLD_OPTIONS: HouseholdType[] = ['family', 'single', 'couple']
+
+const DEFAULT_HOUSEHOLD: HouseholdDetails = {
+  type: 'single',
+  adults: 1,
+  children: 0,
+  incomeSource: 'one',
+}
 
 function bufferTone(days: number): 'ok' | 'watch' | 'tight' {
   if (days >= 7) return 'ok'
@@ -65,12 +84,44 @@ function OptionCard({
   )
 }
 
+function syncPresetsForHousehold(
+  next: HouseholdDetails,
+  mode: Mode,
+  setters: {
+    setWantLabel: (v: string) => void
+    setAmount: (v: number) => void
+    setAmountInput: (v: string) => void
+    setHasAsked: (v: boolean) => void
+    setSelectedOptionId: (v: string | null) => void
+    setVacLabel: (v: string) => void
+    setVacAmountInput: (v: string) => void
+    setVacWeeksInput: (v: string) => void
+    setVacAsked: (v: boolean) => void
+  },
+) {
+  const nextPresets = wantPresetsFor(next)
+  if (nextPresets[0] && mode === 'want') {
+    setters.setWantLabel(nextPresets[0].label)
+    setters.setAmount(nextPresets[0].amount)
+    setters.setAmountInput(String(nextPresets[0].amount))
+    setters.setHasAsked(false)
+    setters.setSelectedOptionId(null)
+  }
+  const vac = vacationSuggestionsFor(next)[0]
+  if (vac && mode === 'vacation') {
+    setters.setVacLabel(vac.label)
+    setters.setVacAmountInput(String(vac.amount))
+    setters.setVacWeeksInput(String(vac.weeksAway))
+    setters.setVacAsked(false)
+  }
+}
+
 export default function App() {
   const [data, setData] = useState<DemoData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [workerId, setWorkerId] = useState<string>('')
   const [mode, setMode] = useState<Mode>('want')
-  const [household, setHousehold] = useState<HouseholdType>('single')
+  const [household, setHousehold] = useState<HouseholdDetails>(DEFAULT_HOUSEHOLD)
   const [householdTouched, setHouseholdTouched] = useState(false)
 
   const [wantLabel, setWantLabel] = useState('Night out')
@@ -97,7 +148,7 @@ export default function App() {
         const first = json.workers[0]
         setWorkerId(first?.worker_id ?? '')
         if (first) {
-          const hh = inferHousehold(first)
+          const hh = inferHouseholdDetails(first)
           setHousehold(hh)
           const presets = wantPresetsFor(hh)
           if (presets[0]) {
@@ -123,7 +174,7 @@ export default function App() {
 
   useEffect(() => {
     if (!worker || householdTouched) return
-    const hh = inferHousehold(worker)
+    const hh = inferHouseholdDetails(worker)
     setHousehold(hh)
     const presets = wantPresetsFor(hh)
     if (presets[0] && !hasAsked) {
@@ -143,6 +194,11 @@ export default function App() {
 
   const presets = useMemo(() => wantPresetsFor(household), [household])
   const vacSuggestions = useMemo(() => vacationSuggestionsFor(household), [household])
+  const framing = useMemo(() => householdFraming(household), [household])
+  const incomeOptions = useMemo(
+    () => incomeSourcesFor(household.type),
+    [household.type],
+  )
 
   const options = useMemo(() => {
     if (!worker || !hasAsked) return []
@@ -223,24 +279,37 @@ export default function App() {
     setVacAsked(true)
   }
 
-  function onHouseholdChange(next: HouseholdType) {
+  const presetSetters = {
+    setWantLabel,
+    setAmount,
+    setAmountInput,
+    setHasAsked,
+    setSelectedOptionId,
+    setVacLabel,
+    setVacAmountInput,
+    setVacWeeksInput,
+    setVacAsked,
+  }
+
+  function onHouseholdChange(nextType: HouseholdType) {
+    const next = applyHouseholdType(household, nextType)
     setHousehold(next)
     setHouseholdTouched(true)
-    const nextPresets = wantPresetsFor(next)
-    if (nextPresets[0] && mode === 'want') {
-      setWantLabel(nextPresets[0].label)
-      setAmount(nextPresets[0].amount)
-      setAmountInput(String(nextPresets[0].amount))
-      setHasAsked(false)
-      setSelectedOptionId(null)
-    }
-    const vac = vacationSuggestionsFor(next)[0]
-    if (vac && mode === 'vacation') {
-      setVacLabel(vac.label)
-      setVacAmountInput(String(vac.amount))
-      setVacWeeksInput(String(vac.weeksAway))
-      setVacAsked(false)
-    }
+    syncPresetsForHousehold(next, mode, presetSetters)
+  }
+
+  function onChildrenChange(nextKids: ChildrenCount) {
+    const next = applyChildrenCount(household, nextKids)
+    setHousehold(next)
+    setHouseholdTouched(true)
+    syncPresetsForHousehold(next, mode, presetSetters)
+  }
+
+  function onIncomeChange(nextIncome: IncomeSource) {
+    const next = applyIncomeSource(household, nextIncome)
+    setHousehold(next)
+    setHouseholdTouched(true)
+    syncPresetsForHousehold(next, mode, presetSetters)
   }
 
   if (error) {
@@ -261,6 +330,7 @@ export default function App() {
 
   const cliff = worker.next_cliff
   const snap = worker.snapshot
+  const kidsLockedCouple = household.type === 'couple'
 
   return (
     <div className="shell">
@@ -321,12 +391,70 @@ export default function App() {
               <button
                 key={h}
                 type="button"
-                className={household === h ? 'is-active' : ''}
+                className={household.type === h ? 'is-active' : ''}
                 onClick={() => onHouseholdChange(h)}
               >
                 {HOUSEHOLD_LABELS[h]}
               </button>
             ))}
+          </div>
+
+          <div className="household-details">
+            <div className="household-detail">
+              <p className="household-label">Children</p>
+              <div
+                className="segmented segmented--compact segmented--chips"
+                role="group"
+                aria-label="Number of children"
+              >
+                {CHILDREN_OPTIONS.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    className={household.children === n ? 'is-active' : ''}
+                    title={
+                      kidsLockedCouple && n > 0
+                        ? 'Adds kids and switches to Family'
+                        : household.type === 'single' && n > 0
+                          ? 'Adds kids as a single-parent Family'
+                          : undefined
+                    }
+                    onClick={() => onChildrenChange(n)}
+                  >
+                    {childrenLabel(n)}
+                  </button>
+                ))}
+              </div>
+              {kidsLockedCouple && (
+                <p className="household-hint">Couple stays at 0 — pick 1+ to switch to Family.</p>
+              )}
+              {household.type === 'single' && (
+                <p className="household-hint">Add kids to plan as a single-parent family.</p>
+              )}
+              {household.type === 'family' && household.adults === 1 && (
+                <p className="household-hint">Framed as single-parent family.</p>
+              )}
+            </div>
+
+            <div className="household-detail">
+              <p className="household-label">Source of income</p>
+              <div
+                className="segmented segmented--compact"
+                role="group"
+                aria-label="Source of income"
+              >
+                {incomeOptions.map((src) => (
+                  <button
+                    key={src}
+                    type="button"
+                    className={household.incomeSource === src ? 'is-active' : ''}
+                    onClick={() => onIncomeChange(src)}
+                  >
+                    {incomeSourceLabel(src, household.type)}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -334,7 +462,9 @@ export default function App() {
       <main className="layout">
         {mode === 'want' ? (
           <section className="hero-panel">
-            <p className="eyebrow">As of {worker.as_of} · {HOUSEHOLD_LABELS[household]}</p>
+            <p className="eyebrow">
+              As of {worker.as_of} · {householdSummary(household)}
+            </p>
             <h1>
               How can I <em>afford</em> this?
             </h1>
@@ -433,13 +563,15 @@ export default function App() {
           </section>
         ) : (
           <section className="hero-panel vacation-panel">
-            <p className="eyebrow">Without feeling the pinch · {HOUSEHOLD_LABELS[household]}</p>
+            <p className="eyebrow">
+              Without feeling the pinch · {householdSummary(household)}
+            </p>
             <h1>
               Plan a <em>holiday</em> that doesn’t hurt
             </h1>
             <p className="hero-lede">
               Holidays are allowed. Unstuck builds a calm sink from flex only — never from
-              rent, essentials, or your buffer — so your {household === 'family' ? 'family trip' : household === 'couple' ? 'couple getaway' : 'solo break'} doesn’t restart the advance cycle.
+              rent, essentials, or your buffer — so your {framing} doesn’t restart the advance cycle.
             </p>
 
             <form className="want-form vacation-form" onSubmit={askVacation}>
@@ -692,12 +824,13 @@ export default function App() {
               {worker.profile.occupation} · {worker.profile.city}
             </p>
             <p className="context-note">
-              {worker.profile.pay_type} pay · household {HOUSEHOLD_LABELS[household].toLowerCase()} ·
-              size {worker.profile.household_size}
+              {worker.profile.pay_type} pay · {householdSummary(household).toLowerCase()} ·
+              demo size {worker.profile.household_size}
               {worker.profile.dependents > 0
-                ? ` · ${worker.profile.dependents} dependent${worker.profile.dependents === 1 ? '' : 's'}`
-                : ''}{' '}
-              · rent burden {worker.profile.rent_burden_band} · ~
+                ? ` · profile ${worker.profile.dependents} dependent${worker.profile.dependents === 1 ? '' : 's'}`
+                : ''}
+              {worker.profile.has_side_gig ? ' · side gig on file' : ''} · rent burden{' '}
+              {worker.profile.rent_burden_band} · ~
               {money(snap.avg_shift_net)} / shift after commute ~
               {moneyExact(snap.commute_per_day)}
             </p>

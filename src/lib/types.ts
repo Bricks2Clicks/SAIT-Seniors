@@ -11,6 +11,24 @@ export type Cliff = {
 
 export type HouseholdType = 'family' | 'single' | 'couple'
 
+/** 4 means “4+”. */
+export type ChildrenCount = 0 | 1 | 2 | 3 | 4
+
+/**
+ * Income shape for the household.
+ * Labels in UI depend on household type (e.g. “One income” vs “Single income”).
+ */
+export type IncomeSource = 'one' | 'both' | 'side_gig'
+
+/** Session-editable household framing used by afford + vacation logic. */
+export type HouseholdDetails = {
+  type: HouseholdType
+  /** Adults in the household (1 = solo / single parent, 2 = couple / two-adult family). */
+  adults: 1 | 2
+  children: ChildrenCount
+  incomeSource: IncomeSource
+}
+
 export type WorkerDemo = {
   worker_id: string
   as_of: string
@@ -129,6 +147,9 @@ export type VacationPlan = {
   timelineCopy: string
   framing: string
   household: HouseholdType
+  children: ChildrenCount
+  incomeSource: IncomeSource
+  partySize: number
   cliffWarning: boolean
   cliffWarningDetail: string | null
   cliffs: CliffProgress[]
