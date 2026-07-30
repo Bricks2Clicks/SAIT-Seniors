@@ -1,7 +1,26 @@
 import { useEffect, useMemo, useState } from 'react'
-import { buildAffordOptions, cycleInsight, money, moneyExact } from './lib/afford'
-import type { AffordOption, DemoData, OptionKind, WorkerDemo } from './lib/types'
+import {
+  AMOUNT_CHIPS,
+  HOUSEHOLD_LABELS,
+  buildAffordOptions,
+  buildVacationPlan,
+  cycleInsight,
+  inferHousehold,
+  money,
+  moneyExact,
+  vacationSuggestionsFor,
+  wantPresetsFor,
+} from './lib/afford'
+import type {
+  AffordOption,
+  DemoData,
+  HouseholdType,
+  OptionKind,
+  WorkerDemo,
+} from './lib/types'
 import './App.css'
+
+type Mode = 'want' | 'vacation'
 
 const KIND_LABEL: Record<OptionKind, string> = {
   flex: 'Spend now',
@@ -11,6 +30,8 @@ const KIND_LABEL: Record<OptionKind, string> = {
   sink: 'Save toward',
   wait: 'Protect',
 }
+
+const HOUSEHOLD_OPTIONS: HouseholdType[] = ['family', 'single', 'couple']
 
 function bufferTone(days: number): 'ok' | 'watch' | 'tight' {
   if (days >= 7) return 'ok'
@@ -48,11 +69,22 @@ export default function App() {
   const [data, setData] = useState<DemoData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [workerId, setWorkerId] = useState<string>('')
+  const [mode, setMode] = useState<Mode>('want')
+  const [household, setHousehold] = useState<HouseholdType>('single')
+  const [householdTouched, setHouseholdTouched] = useState(false)
+
   const [wantLabel, setWantLabel] = useState('Night out')
   const [amount, setAmount] = useState(45)
   const [amountInput, setAmountInput] = useState('45')
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null)
   const [hasAsked, setHasAsked] = useState(false)
+
+  const [vacLabel, setVacLabel] = useState('Long weekend Banff')
+  const [vacAmountInput, setVacAmountInput] = useState('450')
+  const [vacWeeksInput, setVacWeeksInput] = useState('6')
+  const [vacDateInput, setVacDateInput] = useState('')
+  const [vacUseDate, setVacUseDate] = useState(false)
+  const [vacAsked, setVacAsked] = useState(false)
 
   useEffect(() => {
     fetch('/data/demo.json')
@@ -62,7 +94,24 @@ export default function App() {
       })
       .then((json: DemoData) => {
         setData(json)
-        setWorkerId(json.workers[0]?.worker_id ?? '')
+        const first = json.workers[0]
+        setWorkerId(first?.worker_id ?? '')
+        if (first) {
+          const hh = inferHousehold(first)
+          setHousehold(hh)
+          const presets = wantPresetsFor(hh)
+          if (presets[0]) {
+            setWantLabel(presets[0].label)
+            setAmount(presets[0].amount)
+            setAmountInput(String(presets[0].amount))
+          }
+          const vac = vacationSuggestionsFor(hh)[0]
+          if (vac) {
+            setVacLabel(vac.label)
+            setVacAmountInput(String(vac.amount))
+            setVacWeeksInput(String(vac.weeksAway))
+          }
+        }
       })
       .catch((e: Error) => setError(e.message))
   }, [])
@@ -72,10 +121,58 @@ export default function App() {
     [data, workerId],
   )
 
+  useEffect(() => {
+    if (!worker || householdTouched) return
+    const hh = inferHousehold(worker)
+    setHousehold(hh)
+    const presets = wantPresetsFor(hh)
+    if (presets[0] && !hasAsked) {
+      setWantLabel(presets[0].label)
+      setAmount(presets[0].amount)
+      setAmountInput(String(presets[0].amount))
+    }
+    if (!vacAsked) {
+      const vac = vacationSuggestionsFor(hh)[0]
+      if (vac) {
+        setVacLabel(vac.label)
+        setVacAmountInput(String(vac.amount))
+        setVacWeeksInput(String(vac.weeksAway))
+      }
+    }
+  }, [worker, householdTouched, hasAsked, vacAsked])
+
+  const presets = useMemo(() => wantPresetsFor(household), [household])
+  const vacSuggestions = useMemo(() => vacationSuggestionsFor(household), [household])
+
   const options = useMemo(() => {
     if (!worker || !hasAsked) return []
-    return buildAffordOptions(worker, wantLabel.trim() || 'this', amount)
-  }, [worker, wantLabel, amount, hasAsked])
+    return buildAffordOptions(worker, wantLabel.trim() || 'this', amount, household)
+  }, [worker, wantLabel, amount, hasAsked, household])
+
+  const vacationPlan = useMemo(() => {
+    if (!worker || !vacAsked) return null
+    const parsed = Number.parseFloat(vacAmountInput.replace(/[^0-9.]/g, ''))
+    if (!Number.isFinite(parsed) || parsed <= 0) return null
+    const weeks = Number.parseInt(vacWeeksInput, 10)
+    return buildVacationPlan(
+      worker,
+      vacLabel,
+      parsed,
+      vacUseDate && vacDateInput
+        ? { targetDate: vacDateInput }
+        : { weeksAway: Number.isFinite(weeks) && weeks > 0 ? weeks : 6 },
+      household,
+    )
+  }, [
+    worker,
+    vacAsked,
+    vacAmountInput,
+    vacWeeksInput,
+    vacUseDate,
+    vacDateInput,
+    vacLabel,
+    household,
+  ])
 
   useEffect(() => {
     if (!options.length) {
@@ -87,7 +184,7 @@ export default function App() {
   }, [options])
 
   const selected = options.find((o) => o.id === selectedOptionId) ?? null
-  const insight = worker ? cycleInsight(worker) : ''
+  const insight = worker ? cycleInsight(worker, household) : ''
   const tone = worker ? bufferTone(worker.snapshot.buffer_days) : 'watch'
 
   function askAfford(e?: React.FormEvent) {
@@ -103,6 +200,47 @@ export default function App() {
     setAmount(value)
     setAmountInput(String(value))
     setHasAsked(true)
+  }
+
+  function applyAmountChip(value: number) {
+    setAmountInput(String(value))
+    setAmount(value)
+    if (hasAsked) setHasAsked(true)
+  }
+
+  function askVacation(e?: React.FormEvent) {
+    e?.preventDefault()
+    const parsed = Number.parseFloat(vacAmountInput.replace(/[^0-9.]/g, ''))
+    if (!Number.isFinite(parsed) || parsed <= 0) return
+    setVacAsked(true)
+  }
+
+  function applyVacSuggestion(label: string, amount: number, weeksAway: number) {
+    setVacLabel(label)
+    setVacAmountInput(String(amount))
+    setVacWeeksInput(String(weeksAway))
+    setVacUseDate(false)
+    setVacAsked(true)
+  }
+
+  function onHouseholdChange(next: HouseholdType) {
+    setHousehold(next)
+    setHouseholdTouched(true)
+    const nextPresets = wantPresetsFor(next)
+    if (nextPresets[0] && mode === 'want') {
+      setWantLabel(nextPresets[0].label)
+      setAmount(nextPresets[0].amount)
+      setAmountInput(String(nextPresets[0].amount))
+      setHasAsked(false)
+      setSelectedOptionId(null)
+    }
+    const vac = vacationSuggestionsFor(next)[0]
+    if (vac && mode === 'vacation') {
+      setVacLabel(vac.label)
+      setVacAmountInput(String(vac.amount))
+      setVacWeeksInput(String(vac.weeksAway))
+      setVacAsked(false)
+    }
   }
 
   if (error) {
@@ -139,7 +277,9 @@ export default function App() {
             value={workerId}
             onChange={(e) => {
               setWorkerId(e.target.value)
+              setHouseholdTouched(false)
               setHasAsked(false)
+              setVacAsked(false)
               setSelectedOptionId(null)
             }}
           >
@@ -152,92 +292,325 @@ export default function App() {
         </label>
       </header>
 
-      <main className="layout">
-        <section className="hero-panel">
-          <p className="eyebrow">As of {worker.as_of}</p>
-          <h1>
-            How can I <em>afford</em> this?
-          </h1>
-          <p className="hero-lede">
-            Tell Unstuck what you want. We’ll show honest paths that protect rent,
-            essentials, and your safe days — so a yes doesn’t pull you back into the cycle.
-          </p>
+      <div className="controls-bar">
+        <div className="segmented" role="tablist" aria-label="Planner mode">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'want'}
+            className={mode === 'want' ? 'is-active' : ''}
+            onClick={() => setMode('want')}
+          >
+            Afford a want
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'vacation'}
+            className={mode === 'vacation' ? 'is-active' : ''}
+            onClick={() => setMode('vacation')}
+          >
+            Holidays &amp; vacations
+          </button>
+        </div>
 
-          <form className="want-form" onSubmit={askAfford}>
-            <label className="field grow">
-              <span>What do you want?</span>
-              <input
-                value={wantLabel}
-                onChange={(e) => setWantLabel(e.target.value)}
-                placeholder="Night out, shoes, kids treat…"
-                required
-              />
-            </label>
-            <label className="field amount">
-              <span>Amount (CAD)</span>
-              <input
-                inputMode="decimal"
-                value={amountInput}
-                onChange={(e) => setAmountInput(e.target.value)}
-                aria-label="Amount in CAD"
-              />
-            </label>
-            <button type="submit" className="cta">
-              Show me paths
-            </button>
-          </form>
-
-          <div className="presets" aria-label="Quick wants">
-            {worker.want_presets.map((p) => (
+        <div className="household-block">
+          <p className="household-label">Household</p>
+          <div className="segmented segmented--compact" role="group" aria-label="Household type">
+            {HOUSEHOLD_OPTIONS.map((h) => (
               <button
-                key={p.label}
+                key={h}
                 type="button"
-                className="preset"
-                onClick={() => applyPreset(p.label, p.amount)}
+                className={household === h ? 'is-active' : ''}
+                onClick={() => onHouseholdChange(h)}
               >
-                {p.label}
-                <span>{money(p.amount)}</span>
+                {HOUSEHOLD_LABELS[h]}
               </button>
             ))}
           </div>
+        </div>
+      </div>
 
-          {hasAsked && (
-            <div className="results">
-              <div className="results-head">
-                <h2>
-                  Paths to afford <span>{wantLabel}</span> ({moneyExact(amount)})
-                </h2>
-                <p>Ranked for your buffer, next cliff, and advance risk.</p>
-              </div>
+      <main className="layout">
+        {mode === 'want' ? (
+          <section className="hero-panel">
+            <p className="eyebrow">As of {worker.as_of} · {HOUSEHOLD_LABELS[household]}</p>
+            <h1>
+              How can I <em>afford</em> this?
+            </h1>
+            <p className="hero-lede">
+              Tell Unstuck what you want. We’ll show honest paths that protect rent,
+              essentials, and your safe days — so a yes doesn’t pull you back into the cycle.
+            </p>
 
-              <div className="option-grid">
-                {options.map((opt) => (
-                  <OptionCard
-                    key={opt.id}
-                    option={opt}
-                    selected={selectedOptionId === opt.id}
-                    onSelect={() => setSelectedOptionId(opt.id)}
-                  />
-                ))}
-              </div>
+            <form className="want-form" onSubmit={askAfford}>
+              <label className="field grow">
+                <span>What do you want?</span>
+                <input
+                  value={wantLabel}
+                  onChange={(e) => setWantLabel(e.target.value)}
+                  placeholder="Night out, shoes, kids treat…"
+                  required
+                />
+              </label>
+              <label className="field amount">
+                <span>Amount (CAD)</span>
+                <input
+                  inputMode="decimal"
+                  value={amountInput}
+                  onChange={(e) => setAmountInput(e.target.value)}
+                  aria-label="Amount in CAD"
+                />
+              </label>
+              <button type="submit" className="cta">
+                Show me paths
+              </button>
+            </form>
 
-              {selected && (
-                <div className="path-focus" role="status">
-                  <p className="path-focus__label">Your path</p>
-                  <h3>{selected.title}</h3>
-                  <p>{selected.detail}</p>
-                  {selected.kind === 'wait' && snap.advance_count_month > 0 && (
-                    <p className="path-focus__warn">
-                      Advance alert: {snap.advance_count_month} advance
-                      {snap.advance_count_month === 1 ? '' : 's'} this month ·{' '}
-                      {moneyExact(snap.advance_fees_month)} in fees so far.
-                    </p>
-                  )}
-                </div>
-              )}
+            <div className="amount-chips" aria-label="Quick amounts">
+              {AMOUNT_CHIPS.map((chip) => (
+                <button
+                  key={chip}
+                  type="button"
+                  className={`amount-chip ${Number(amountInput) === chip ? 'is-active' : ''}`}
+                  onClick={() => applyAmountChip(chip)}
+                >
+                  {money(chip)}
+                </button>
+              ))}
             </div>
-          )}
-        </section>
+
+            <div className="presets" aria-label="Quick wants">
+              {presets.map((p) => (
+                <button
+                  key={p.label}
+                  type="button"
+                  className="preset"
+                  onClick={() => applyPreset(p.label, p.amount)}
+                >
+                  {p.label}
+                  <span>{money(p.amount)}</span>
+                </button>
+              ))}
+            </div>
+
+            {hasAsked && (
+              <div className="results">
+                <div className="results-head">
+                  <h2>
+                    Paths to afford <span>{wantLabel}</span> ({moneyExact(amount)})
+                  </h2>
+                  <p>Ranked for your buffer, next cliff, and advance risk.</p>
+                </div>
+
+                <div className="option-grid">
+                  {options.map((opt) => (
+                    <OptionCard
+                      key={opt.id}
+                      option={opt}
+                      selected={selectedOptionId === opt.id}
+                      onSelect={() => setSelectedOptionId(opt.id)}
+                    />
+                  ))}
+                </div>
+
+                {selected && (
+                  <div className="path-focus" role="status">
+                    <p className="path-focus__label">Your path</p>
+                    <h3>{selected.title}</h3>
+                    <p>{selected.detail}</p>
+                    {selected.kind === 'wait' && snap.advance_count_month > 0 && (
+                      <p className="path-focus__warn">
+                        Advance alert: {snap.advance_count_month} advance
+                        {snap.advance_count_month === 1 ? '' : 's'} this month ·{' '}
+                        {moneyExact(snap.advance_fees_month)} in fees so far.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+        ) : (
+          <section className="hero-panel vacation-panel">
+            <p className="eyebrow">Without feeling the pinch · {HOUSEHOLD_LABELS[household]}</p>
+            <h1>
+              Plan a <em>holiday</em> that doesn’t hurt
+            </h1>
+            <p className="hero-lede">
+              Holidays are allowed. Unstuck builds a calm sink from flex only — never from
+              rent, essentials, or your buffer — so your {household === 'family' ? 'family trip' : household === 'couple' ? 'couple getaway' : 'solo break'} doesn’t restart the advance cycle.
+            </p>
+
+            <form className="want-form vacation-form" onSubmit={askVacation}>
+              <label className="field grow">
+                <span>Destination / label</span>
+                <input
+                  value={vacLabel}
+                  onChange={(e) => setVacLabel(e.target.value)}
+                  placeholder="Long weekend Banff, visit family…"
+                  required
+                />
+              </label>
+              <label className="field amount">
+                <span>Target (CAD)</span>
+                <input
+                  inputMode="decimal"
+                  value={vacAmountInput}
+                  onChange={(e) => setVacAmountInput(e.target.value)}
+                  aria-label="Vacation target amount in CAD"
+                />
+              </label>
+              {!vacUseDate ? (
+                <label className="field amount">
+                  <span>Weeks away</span>
+                  <input
+                    inputMode="numeric"
+                    value={vacWeeksInput}
+                    onChange={(e) => setVacWeeksInput(e.target.value)}
+                    aria-label="Weeks until vacation"
+                  />
+                </label>
+              ) : (
+                <label className="field amount">
+                  <span>Target date</span>
+                  <input
+                    type="date"
+                    value={vacDateInput}
+                    onChange={(e) => setVacDateInput(e.target.value)}
+                    aria-label="Vacation target date"
+                  />
+                </label>
+              )}
+              <button type="submit" className="cta">
+                Show calm plan
+              </button>
+            </form>
+
+            <div className="date-toggle-row">
+              <button
+                type="button"
+                className={`text-toggle ${!vacUseDate ? 'is-active' : ''}`}
+                onClick={() => setVacUseDate(false)}
+              >
+                Weeks away
+              </button>
+              <button
+                type="button"
+                className={`text-toggle ${vacUseDate ? 'is-active' : ''}`}
+                onClick={() => setVacUseDate(true)}
+              >
+                Exact date
+              </button>
+            </div>
+
+            <div className="presets" aria-label="Vacation ideas">
+              {vacSuggestions.map((v) => (
+                <button
+                  key={v.label}
+                  type="button"
+                  className="preset"
+                  onClick={() => applyVacSuggestion(v.label, v.amount, v.weeksAway)}
+                >
+                  {v.label}
+                  <span>
+                    {money(v.amount)} · {v.weeksAway}w
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {vacAsked && vacationPlan && (
+              <div className="results vacation-results">
+                <div className="results-head">
+                  <h2>
+                    No-pinch plan for <span>{vacationPlan.label}</span>
+                  </h2>
+                  <p>
+                    {money(vacationPlan.targetAmount)} by {vacationPlan.targetDate} · a grounded{' '}
+                    {vacationPlan.framing}
+                  </p>
+                </div>
+
+                <div className="vac-metrics">
+                  <article className="vac-metric">
+                    <p className="context-label">Safe contribution</p>
+                    <p className="vac-metric__value">
+                      {money(vacationPlan.safeContributionDaily)}
+                      <span>/day from flex</span>
+                    </p>
+                    <p className="context-note">{vacationPlan.bufferNote}</p>
+                  </article>
+                  <article className="vac-metric">
+                    <p className="context-label">Daily / weekly sink</p>
+                    <p className="vac-metric__value">
+                      {money(vacationPlan.dailySink)}
+                      <span>
+                        /day · {money(vacationPlan.weeklySink)}/week
+                      </span>
+                    </p>
+                    <p className="context-note">
+                      From good weeks only — never rent, essentials, or buffer floor.
+                    </p>
+                  </article>
+                  <article className="vac-metric">
+                    <p className="context-label">Shifts at avg net</p>
+                    <p className="vac-metric__value">
+                      {vacationPlan.shiftsNeeded}
+                      <span>
+                        × ~{money(vacationPlan.netPerShift)} after commute
+                      </span>
+                    </p>
+                    <p className="context-note">
+                      Flex share of take-home parked toward the trip — not the whole cheque.
+                    </p>
+                  </article>
+                </div>
+
+                <div className="path-focus vac-timeline" role="status">
+                  <p className="path-focus__label">Timeline</p>
+                  <h3>
+                    Ready by {vacationPlan.readyByDate}
+                    {vacationPlan.daysUntil > 0
+                      ? ` · target in ${vacationPlan.daysUntil} days`
+                      : ''}
+                  </h3>
+                  <p>{vacationPlan.timelineCopy}</p>
+                </div>
+
+                {vacationPlan.cliffWarning && vacationPlan.cliffWarningDetail && (
+                  <div className="vac-warning" role="alert">
+                    <p className="vac-warning__label">Cliff warning</p>
+                    <p>{vacationPlan.cliffWarningDetail}</p>
+                  </div>
+                )}
+
+                {vacationPlan.cliffs.length > 0 && (
+                  <div className="vac-cliffs">
+                    <p className="context-label">Progress vs next cliffs</p>
+                    <ul>
+                      {vacationPlan.cliffs.map((c) => (
+                        <li key={`${c.name}-${c.due_date}`} className={`vac-cliff vac-cliff--${c.status}`}>
+                          <div>
+                            <strong>{c.name}</strong>
+                            <span>
+                              {money(c.amount)} ·{' '}
+                              {c.days_until <= 0
+                                ? 'due'
+                                : `in ${c.days_until}d`}
+                              {c.essential ? ' · essential' : ''}
+                            </span>
+                          </div>
+                          <p>{c.note}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+        )}
 
         <aside className="context-rail" aria-label="Supporting money context">
           <article className={`context-card buffer buffer--${tone}`}>
@@ -319,7 +692,12 @@ export default function App() {
               {worker.profile.occupation} · {worker.profile.city}
             </p>
             <p className="context-note">
-              {worker.profile.pay_type} pay · rent burden {worker.profile.rent_burden_band} · ~
+              {worker.profile.pay_type} pay · household {HOUSEHOLD_LABELS[household].toLowerCase()} ·
+              size {worker.profile.household_size}
+              {worker.profile.dependents > 0
+                ? ` · ${worker.profile.dependents} dependent${worker.profile.dependents === 1 ? '' : 's'}`
+                : ''}{' '}
+              · rent burden {worker.profile.rent_burden_band} · ~
               {money(snap.avg_shift_net)} / shift after commute ~
               {moneyExact(snap.commute_per_day)}
             </p>

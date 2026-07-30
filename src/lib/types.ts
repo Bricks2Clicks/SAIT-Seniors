@@ -9,6 +9,8 @@ export type Cliff = {
   autopay: boolean
 }
 
+export type HouseholdType = 'family' | 'single' | 'couple'
+
 export type WorkerDemo = {
   worker_id: string
   as_of: string
@@ -88,4 +90,48 @@ export type AffordOption = {
   safe: boolean
   recommended: boolean
   meta: Record<string, string | number | boolean>
+}
+
+export type WantPreset = {
+  label: string
+  amount: number
+}
+
+export type VacationSuggestion = {
+  label: string
+  amount: number
+  weeksAway: number
+}
+
+export type CliffProgress = {
+  name: string
+  amount: number
+  due_date: string
+  days_until: number
+  essential: boolean
+  note: string
+  status: 'protect' | 'clear' | 'after'
+}
+
+export type VacationPlan = {
+  label: string
+  targetAmount: number
+  targetDate: string
+  daysUntil: number
+  weeksUntil: number
+  dailySink: number
+  weeklySink: number
+  shiftsNeeded: number
+  netPerShift: number
+  safeContributionDaily: number
+  safeContributionWeekly: number
+  readyByDate: string
+  timelineCopy: string
+  framing: string
+  household: HouseholdType
+  cliffWarning: boolean
+  cliffWarningDetail: string | null
+  cliffs: CliffProgress[]
+  bufferHealthy: boolean
+  bufferNote: string
 }
